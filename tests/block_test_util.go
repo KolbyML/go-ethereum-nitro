@@ -111,11 +111,39 @@ type btHeaderMarshaling struct {
 	ExcessBlobGas *math.HexOrDecimal64
 }
 
-func (t *BlockTest) Run(snapshotter bool, scheme string, witness bool, tracer *tracing.Hooks, postCheck func(error, *core.BlockChain)) (result error) {
+func (t *BlockTest) Run(snapshotter bool, scheme string, witness bool, tracer *tracing.Hooks, postCheck func(error, *core.BlockChain), isArbitrum bool) (result error) {
 	config, ok := Forks[t.json.Network]
 	if !ok {
 		return UnsupportedForkError{t.json.Network}
 	}
+	fmt.Println("world!3", config, t.json.Network)
+	switch t.json.Network {
+	case "Prague", "Cancun", "Paris", "London":
+		fmt.Println("world!1232")
+		config.ArbitrumChainParams = params.ArbitrumChainParams{
+			EnableArbOS:               true,
+			AllowDebugPrecompiles:     false,
+			DataAvailabilityCommittee: false,
+			InitialArbOSVersion:       6,
+			InitialChainOwner:         common.HexToAddress("0xd345e41ae2cb00311956aa7109fc801ae8c81a52"),
+			GenesisBlockNum:           0,
+		}
+	default:
+		fmt.Println("world!22222")
+	}
+
+	fmt.Println("world!3end")
+
+	// config.ArbitrumChainParams = params.ArbitrumChainParams{
+	// 	EnableArbOS:               true,
+	// 	AllowDebugPrecompiles:     false,
+	// 	DataAvailabilityCommittee: false,
+	// 	InitialArbOSVersion:       6,
+	// 	InitialChainOwner:         common.HexToAddress("0xd345e41ae2cb00311956aa7109fc801ae8c81a52"),
+	// 	GenesisBlockNum:           0,
+	// }
+
+	fmt.Println("world!4", config)
 	// import pre accounts & construct test genesis block & state root
 	var (
 		db    = rawdb.NewMemoryDatabase()
@@ -141,7 +169,8 @@ func (t *BlockTest) Run(snapshotter bool, scheme string, witness bool, tracer *t
 		return err
 	}
 	triedb.Close() // close the db to prevent memory leak
-
+	fmt.Println("world!2", gblock, "\n\n", t.json.Genesis)
+	fmt.Println("world!", gblock.Hash(), t.json.Genesis.Hash)
 	if gblock.Hash() != t.json.Genesis.Hash {
 		return fmt.Errorf("genesis block hash doesn't match test: computed=%x, test=%x", gblock.Hash().Bytes()[:6], t.json.Genesis.Hash[:6])
 	}
@@ -150,7 +179,7 @@ func (t *BlockTest) Run(snapshotter bool, scheme string, witness bool, tracer *t
 	}
 	// Wrap the original engine within the beacon-engine
 	engine := beacon.New(ethash.NewFaker())
-
+	fmt.Println("hi 22")
 	cache := &core.CacheConfig{TrieCleanLimit: 0, StateScheme: scheme, Preimages: true, TriesInMemory: 128}
 	if snapshotter {
 		cache.SnapshotLimit = 1
@@ -164,33 +193,39 @@ func (t *BlockTest) Run(snapshotter bool, scheme string, witness bool, tracer *t
 		return err
 	}
 	defer chain.Stop()
-
+	fmt.Println("hi 33")
 	validBlocks, err := t.insertBlocks(chain)
 	if err != nil {
 		return err
 	}
 	// Import succeeded: regardless of whether the _test_ succeeds or not, schedule
 	// the post-check to run
+	fmt.Println("hi 44")
 	if postCheck != nil {
 		defer postCheck(result, chain)
 	}
+	fmt.Println("hi 55")
 	cmlast := chain.CurrentBlock().Hash()
 	if common.Hash(t.json.BestBlock) != cmlast {
 		return fmt.Errorf("last block hash validation mismatch: want: %x, have: %x", t.json.BestBlock, cmlast)
 	}
+	fmt.Println("hi 66")
 	newDB, err := chain.State()
 	if err != nil {
 		return err
 	}
+	fmt.Println("hi 77")
 	if err = t.validatePostState(newDB); err != nil {
 		return fmt.Errorf("post state validation failed: %v", err)
 	}
+	fmt.Println("hi 88")
 	// Cross-check the snapshot-to-hash against the trie hash
 	if snapshotter {
 		if err := chain.Snapshots().Verify(chain.CurrentBlock().Root); err != nil {
 			return err
 		}
 	}
+	fmt.Println("hi 99")
 	return t.validateImportedHeaders(chain, validBlocks)
 }
 
@@ -241,6 +276,7 @@ func (t *BlockTest) insertBlocks(blockchain *core.BlockChain) ([]btBlock, error)
 		}
 		// RLP decoding worked, try to insert into chain:
 		blocks := types.Blocks{cb}
+		fmt.Println("hi b1")
 		i, err := blockchain.InsertChain(blocks)
 		if err != nil {
 			if b.BlockHeader == nil {
@@ -249,6 +285,7 @@ func (t *BlockTest) insertBlocks(blockchain *core.BlockChain) ([]btBlock, error)
 				return nil, fmt.Errorf("block #%v insertion into chain failed: %v", blocks[i].Number(), err)
 			}
 		}
+		fmt.Println("hi b2")
 		if b.BlockHeader == nil {
 			if data, err := json.MarshalIndent(cb.Header(), "", "  "); err == nil {
 				fmt.Fprintf(os.Stderr, "block (index %d) insertion should have failed due to: %v:\n%v\n",
@@ -257,11 +294,12 @@ func (t *BlockTest) insertBlocks(blockchain *core.BlockChain) ([]btBlock, error)
 			return nil, fmt.Errorf("block (index %d) insertion should have failed due to: %v",
 				bi, b.ExpectException)
 		}
-
+		fmt.Println("hi b3")
 		// validate RLP decoding by checking all values against test file JSON
 		if err = validateHeader(b.BlockHeader, cb.Header()); err != nil {
 			return nil, fmt.Errorf("deserialised block header validation failed: %v", err)
 		}
+		fmt.Println("hi b4")
 		validBlocks = append(validBlocks, b)
 	}
 	return validBlocks, nil

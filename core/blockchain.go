@@ -510,6 +510,7 @@ func NewBlockChainExtended(db ethdb.Database, cacheConfig *CacheConfig, chainCon
 	// The first thing the node will do is reconstruct the verification data for
 	// the head block (ethash cache or clique voting snapshot). Might as well do
 	// it in advance.
+	fmt.Println("hi sad")
 	bc.engine.VerifyHeader(bc, bc.CurrentHeader())
 
 	if bc.logger != nil && bc.logger.OnBlockchainInit != nil {
@@ -1794,6 +1795,7 @@ func (bc *BlockChain) writeBlockAndSetHead(block *types.Block, receipts []*types
 // the index number of the failing block as well an error describing what went
 // wrong. After insertion is done, all accumulated events will be fired.
 func (bc *BlockChain) InsertChain(chain types.Blocks) (int, error) {
+	fmt.Println("hi bbbcvcc")
 	// Sanity check that we have something meaningful to import
 	if len(chain) == 0 {
 		return 0, nil
@@ -1866,6 +1868,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, setHead bool, makeWitness 
 	for i, block := range chain {
 		headers[i] = block.Header()
 	}
+	fmt.Println("hi xx")
 	abort, results := bc.engine.VerifyHeaders(bc, headers)
 	defer close(abort)
 

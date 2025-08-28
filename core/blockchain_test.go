@@ -140,6 +140,7 @@ func testFork(t *testing.T, blockchain *BlockChain, i, n int, full bool, scheme 
 // testBlockChainImport tries to process a chain of blocks, writing them into
 // the database if successful.
 func testBlockChainImport(chain types.Blocks, blockchain *BlockChain) error {
+	fmt.Println("hi good")
 	for _, block := range chain {
 		// Try and process the block
 		err := blockchain.engine.VerifyHeader(blockchain, block.Header())
@@ -178,6 +179,7 @@ func testBlockChainImport(chain types.Blocks, blockchain *BlockChain) error {
 // testHeaderChainImport tries to process a chain of header, writing them into
 // the database if successful.
 func testHeaderChainImport(chain []*types.Header, blockchain *BlockChain) error {
+	fmt.Println("hi baad")
 	for _, header := range chain {
 		// Try and validate the header
 		if err := blockchain.engine.VerifyHeader(blockchain, header); err != nil {

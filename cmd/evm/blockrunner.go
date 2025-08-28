@@ -95,7 +95,7 @@ func runBlockTest(ctx *cli.Context, fname string) ([]testResult, error) {
 					result.State = dump(s)
 				}
 			}
-		}); err != nil {
+		}, false); err != nil {
 			result.Pass, result.Error = false, err.Error()
 		}
 		results = append(results, *result)

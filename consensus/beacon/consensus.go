@@ -149,13 +149,18 @@ func (beacon *Beacon) splitHeaders(headers []*types.Header) ([]*types.Header, []
 // a results channel to retrieve the async verifications.
 // VerifyHeaders expect the headers to be ordered and continuous.
 func (beacon *Beacon) VerifyHeaders(chain consensus.ChainHeaderReader, headers []*types.Header) (chan<- struct{}, <-chan error) {
+	fmt.Println("hi dadddd")
 	preHeaders, postHeaders := beacon.splitHeaders(headers)
 	if len(postHeaders) == 0 {
 		return beacon.ethone.VerifyHeaders(chain, headers)
 	}
+	fmt.Println("hi ddfdf")
 	if len(preHeaders) == 0 {
 		return beacon.verifyHeaders(chain, headers, nil)
 	}
+
+	fmt.Println("hi fff")
+
 	// The transition point exists in the middle, separate the headers
 	// into two batches and apply different verification rules for them.
 	var (

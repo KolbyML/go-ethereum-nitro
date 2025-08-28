@@ -290,6 +290,7 @@ func (hc *HeaderChain) ValidateHeaderChain(chain []*types.Header) (int, error) {
 		}
 	}
 	// Start the parallel verifier
+	fmt.Println("hi zzz")
 	abort, results := hc.engine.VerifyHeaders(hc, chain)
 	defer close(abort)
 

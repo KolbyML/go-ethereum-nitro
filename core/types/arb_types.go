@@ -642,6 +642,8 @@ func (info HeaderInfo) UpdateHeaderWithInfo(header *Header) {
 }
 
 func DeserializeHeaderExtraInformation(header *Header) HeaderInfo {
+	fmt.Println("bbiiaaa", header.BaseFee, len(header.Extra), header.Difficulty)
+	fmt.Println("bbiicccc", header == nil, header.BaseFee == nil, len(header.Extra) != 32, header.Difficulty.Cmp(common.Big1) != 0)
 	if header == nil || header.BaseFee == nil || len(header.Extra) != 32 || header.Difficulty.Cmp(common.Big1) != 0 {
 		// imported blocks have no base fee
 		// The genesis block doesn't have an ArbOS encoded extra field
@@ -649,6 +651,7 @@ func DeserializeHeaderExtraInformation(header *Header) HeaderInfo {
 	}
 	extra := HeaderInfo{}
 	copy(extra.SendRoot[:], header.Extra)
+	fmt.Println("bbiibb", header.MixDigest)
 	extra.SendCount = binary.BigEndian.Uint64(header.MixDigest[:8])
 	extra.L1BlockNumber = binary.BigEndian.Uint64(header.MixDigest[8:16])
 	extra.ArbOSFormatVersion = binary.BigEndian.Uint64(header.MixDigest[16:24])

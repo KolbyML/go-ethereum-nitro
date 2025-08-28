@@ -17,6 +17,7 @@
 package core
 
 import (
+	"fmt"
 	"math/big"
 	"testing"
 	"time"
@@ -56,6 +57,7 @@ func testHeaderVerification(t *testing.T, scheme string) {
 		t.Fatal(err)
 	}
 
+	fmt.Println("hi cr")
 	for i := 0; i < len(blocks); i++ {
 		for j, valid := range []bool{true, false} {
 			var results <-chan error
@@ -92,6 +94,7 @@ func TestHeaderVerificationForMergingEthash(t *testing.T) { testHeaderVerificati
 
 // Tests the verification for eth1/2 merging, including pre-merge and post-merge
 func testHeaderVerificationForMerging(t *testing.T, isClique bool) {
+	fmt.Println("hi dd")
 	var (
 		gspec      *Genesis
 		preBlocks  []*types.Block

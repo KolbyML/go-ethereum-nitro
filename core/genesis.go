@@ -488,6 +488,7 @@ func (g *Genesis) toBlockWithRoot(root common.Hash) *types.Block {
 		}
 	}
 	if g.Config != nil && g.Config.IsLondon(common.Big0) {
+		fmt.Println("Dog 0")
 		if g.BaseFee != nil {
 			head.BaseFee = g.BaseFee
 		} else {
@@ -500,11 +501,15 @@ func (g *Genesis) toBlockWithRoot(root common.Hash) *types.Block {
 	if conf := g.Config; conf != nil {
 		num := big.NewInt(int64(g.Number))
 		arbosVersion := types.DeserializeHeaderExtraInformation(head).ArbOSFormatVersion
+		fmt.Println("eee:", head.MixDigest)
+		fmt.Println("ArbOS version:", arbosVersion)
 		if conf.IsShanghai(num, g.Timestamp, arbosVersion) {
+			fmt.Println("Dog 1")
 			head.WithdrawalsHash = &types.EmptyWithdrawalsHash
 			withdrawals = make([]*types.Withdrawal, 0)
 		}
 		if conf.IsCancun(num, g.Timestamp, arbosVersion) {
+			fmt.Println("Dog 2")
 			// EIP-4788: The parentBeaconBlockRoot of the genesis block is always
 			// the zero hash. This is because the genesis block does not have a parent
 			// by definition.
@@ -520,6 +525,7 @@ func (g *Genesis) toBlockWithRoot(root common.Hash) *types.Block {
 			}
 		}
 		if conf.IsPrague(num, g.Timestamp, arbosVersion) {
+			fmt.Println("Dog 3")
 			head.RequestsHash = &types.EmptyRequestsHash
 		}
 	}
@@ -548,6 +554,7 @@ func (g *Genesis) Commit(db ethdb.Database, triedb *triedb.Database) (*types.Blo
 		return nil, err
 	}
 	block := g.toBlockWithRoot(root)
+	fmt.Println("Genesis block hash:", block, "\nbig", block.Header(), "\nbig", block.Body())
 
 	// Marshal the genesis state specification and persist.
 	blob, err := json.Marshal(g.Alloc)

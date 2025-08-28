@@ -171,6 +171,16 @@ func GetChainConfig(forkString string) (baseConfig *params.ChainConfig, eips []i
 	if baseConfig, ok = Forks[baseName]; !ok {
 		return nil, nil, UnsupportedForkError{baseName}
 	}
+	if true {
+		baseConfig.ArbitrumChainParams = params.ArbitrumChainParams{
+			EnableArbOS:               true,
+			AllowDebugPrecompiles:     false,
+			DataAvailabilityCommittee: false,
+			InitialArbOSVersion:       6,
+			InitialChainOwner:         common.HexToAddress("0xd345e41ae2cb00311956aa7109fc801ae8c81a52"),
+			GenesisBlockNum:           0,
+		}
+	}
 	for _, eip := range eipsStrings {
 		if eipNum, err := strconv.Atoi(eip); err != nil {
 			return nil, nil, fmt.Errorf("syntax error, invalid eip number %v", eipNum)
